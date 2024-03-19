@@ -1,0 +1,482 @@
+Expense Tracker
+https://youtu.be/hNPwdOZ3qFU?t=1247
+
+
+*) Create project dir: /var/www/html/vue_expense_tracker/
+*) cd vue_expense_tracker/
+*) npx create-vue@latest .
+*) No to all options.
+*) npm i
+*) npm run dev
+
+- - - - - - - - -
+
+*) Change project title (index.html): <title>Expense Tracker</title>
+*) Delete contents of src/assets/ and src/components/
+*) Edit src/App.vue:
+
+.......................................
+<script setup>
+</script>
+
+<template>
+My App
+</template>
+
+<style scoped>
+</style>
+.......................................
+
+*) Create src/assets/style.css and paste https://github.com/bradtraversy/vanillawebprojects/blob/master/expense-tracker/style.css
+
+*) Update first line of src/main.js:
+.......................................
+import './assets/style.css'
+.......................................
+
+*) Create 5 components files with <script setup> <template> <style scoped> boilerplate:
+
+- scr/components/Header.vue
+- scr/components/Balance.vue
+- scr/components/IncomeExpenses.vue
+- scr/components/TransactionList.vue
+- scr/components/AddTransaction.vue
+
+Add h2 to Header.vue file:
+.......................................
+<template>
+    <h2>Expense Tracker</h2>
+</template>
+.......................................
+
+*) Edit src/App.vue file to display Header:
+.......................................
+<script setup>
+    import Header from './components/Header.vue';
+</script>
+
+<template>
+    <Header />
+</template>
+.......................................
+
+
+# #############################################
+# Components
+# #############################################
+
+All the code below the Header is in a div continer class, so add this to src/App.vue file (including Balance, IncomeExpenses, History & AddTransaction components):
+.......................................
+<script setup>
+    import Header from './components/Header.vue';
+    import Balance from './components/Balance.vue';
+    import Balance from './components/IncomeExpenses.vue';
+    import Balance from './components/History.vue';
+    import Balance from './components/AddTransaction.vue';
+</script>
+
+<template>
+    <Header />
+    <div class="container">
+        <Balance />
+        <IncomeExpenses />
+        <History />
+        <AddTransaction />
+    </div>
+</template>
+.......................................
+
+Copy/paste Balance code from GitHub: https://github.com/bradtraversy/vanillawebprojects/blob/master/expense-tracker/index.html
+
+Balance.vue ($ replaced with £)
+.......................................
+<template>
+    <h4>Your Balance</h4>
+    <h1 id="balance">£0.00</h1>
+</template>
+.......................................
+
+IncomeExpenses.vue ($ replaced with £)
+.......................................
+<template>
+    <div class="inc-exp-container">
+        <div>
+            <h4>Income</h4>
+            <p id="money-plus" class="money plus">+£0.00</p>
+        </div>
+        <div>
+            <h4>Expense</h4>
+            <p id="money-minus" class="money minus">-£0.00</p>
+        </div>
+    </div>
+</template>
+.......................................
+
+History.vue ($ replaced with £)
+.......................................
+<template>
+    <h3>History</h3>
+    <ul id="list" class="list">
+        <li class="minus">
+            Cash <span>-£400</span><button class="delete-btn">x</button>
+        </li>
+        <li class="plus">
+            Coding Work <span>£900</span><button class="delete-btn">x</button>
+        </li>
+    </ul>
+</template>
+.......................................
+
+AddTransaction.vue
+.......................................
+<template>
+    <h3>Add new TX</h3>
+    <form id="form">
+        <div class="form-control">
+            <label for="text">Text</label>
+            <input type="text" id="text" placeholder="Enter text..." />
+        </div>
+        <div class="form-control">
+            <label for="amount">Amount <br />
+            (negative - expense, positive - income)</label>
+            <input type="text" id="amount" placeholder="Enter amount..." />
+        </div>
+        <button class="btn">Add TX</button>
+    </form>
+</template>
+.......................................
+
+# #############################################
+# Assign history to array
+# #############################################
+
+App.vue
+.......................................
+<script setup>
+    import Header from './components/Header.vue';
+    import Balance from './components/Balance.vue';
+    import IncomeExpenses from './components/IncomeExpenses.vue';
+    import History from './components/History.vue';
+    import AddTransaction from './components/AddTransaction.vue';
+
+    // Required to be reactive - updates display when array data updates
+    import { ref } from 'vue';
+
+    // Exists here to make available to all components that require data
+    const txs = ref([
+        { id: 1, text: 'Flower', amount: -19.99 },
+        { id: 2, text: 'Payment', amount: 299.97 },
+        { id: 3, text: 'Book', amount: -10.95 },
+    ]);
+</script>
+
+<template>
+    <Header />
+    <div class="container">
+        <Balance />
+        <IncomeExpenses />
+        <History :txs="txs" /> <!-- Pass in props -->
+        <AddTransaction />
+    </div>
+</template>
+.......................................
+
+History.vue
+.......................................
+<script setup>
+    // Required to use 'const txs' in 'src/App.vue'
+    const props = defineProps({
+        txs: {
+            type: Array,
+            required: true
+        }
+    });
+</script>
+
+<template>
+    <h3>History</h3>
+    <ul id="list" class="list">
+        <li
+            v-for="tx in txs"
+            :key="tx.id"
+            :class="tx.amount < 0 ? 'minus' : 'plus'"
+        >
+            {{tx.text}} <span>{{tx.amount}}</span><button class="delete-btn">x</button>
+        </li>
+    </ul>
+</template>
+.......................................
+
+
+# #############################################
+# Add computed method to update Balance
+# ############################################# 
+
+App.vue
+.......................................
+<script setup>
+	...
+	
+	import { ref, computed } from 'vue';
+	
+	...
+	
+	// Add all amounts and return total
+    const total = computed(() => {
+        return txs.value
+        .reduce((acc, tx) => {
+            return acc + tx.amount;
+        }, 0).toFixed(2);
+    });
+</script>
+
+<template>
+	...
+		<Balance :total="+total" /> <!-- + converts string to number -->
+</template>
+.......................................
+
+Balance.vue
+.......................................
+<script setup>
+    const props = defineProps({
+        total: {
+            type: Number,
+            required: true
+        }
+    });
+</script>
+
+<template>
+    <h4>Your Balance</h4>
+    <h1 id="balance">{{ total }}</h1>
+</template>
+.......................................
+
+# #############################################
+# Add computed methods to update IncomeExpenses
+# ############################################# 
+
+App.vue
+.......................................
+<script setup>
+	...
+	
+	import { ref, computed } from 'vue';
+	
+	...
+	
+    // Get total income
+    const totalIncome = computed(() => {
+        return txs.value
+        .filter((tx) => tx.amount > 0)
+        .reduce((acc, tx) => {
+            return acc + tx.amount;
+        }, 0).toFixed(2);
+    });
+    
+    // Get total expenses
+    const totalExpenses = computed(() => {
+        return txs.value
+        .filter((tx) => tx.amount < 0)
+        .reduce((acc, tx) => {
+            return acc + tx.amount;
+        }, 0).toFixed(2);
+    });
+</script>
+
+<template>
+	...
+		<IncomeExpenses :totalIncome="+totalIncome" :totalExpenses="+totalExpenses" />
+    ...
+</template>
+.......................................
+
+IncomeExpenses.vue
+.......................................
+<script setup>
+    const props = defineProps({
+        totalIncome: {
+            type: Number,
+            required: true
+        },
+        totalExpenses: {
+            type: Number,
+            required: true
+        }
+    });
+</script>
+
+<template>
+    <div class="inc-exp-container">
+        <div>
+            <h4>Income</h4>
+            <p id="money-plus" class="money plus">{{ totalIncome }}</p>
+        </div>
+        <div>
+            <h4>Expense</h4>
+            <p id="money-minus" class="money minus">{{ totalExpenses }}</p>
+        </div>
+    </div>
+</template>
+.......................................
+
+
+# #############################################
+# Add Transaction
+# ############################################# 
+
+AddTransaction.vue
+.......................................
+<script setup>
+    import { ref } from 'vue';
+    // Needs installing: $ npm i vue-toastification@next
+    // Also requires referencing in src/main.js
+    import { useToast } from 'vue-toastification';
+
+    const text = ref('');
+    const amount = ref('');
+
+    const emit = defineEmits(['txSubmitted']);
+    const toast = useToast();
+    
+    const onSubmit = () => {
+        if (!text.value || !amount.value) {
+            // The toast message duration time is set globally in 'src/main.js',
+            // but can also be set independently by passing as 2nd param: ('Both fields must be filled!',{ timeout: 2000 })
+            toast.error('Both fields must be filled!');
+            return;
+        }
+
+        // console.log(text.value, amount.value);
+        
+        const txData = {
+            text: text.value,
+            amount: parseFloat(amount.value)
+        }
+
+        emit('txSubmitted', txData);
+
+        text.value = '';
+        amount.value = '';
+    };
+</script>
+
+<template>
+    <h3>Add new TX</h3>
+    <form id="form" @submit.prevent="onSubmit">
+        <div class="form-control">
+            <label for="text">Text</label>
+            <input type="text" id="text" v-model="text" placeholder="Enter text..." autocomplete="off" />
+        </div>
+        <div class="form-control">
+            <label for="amount">Amount <br />
+            (negative - expense, positive - income)</label>
+            <input type="text" id="amount" v-model="amount" placeholder="Enter amount..." autocomplete="off" />
+        </div>
+        <button class="btn">Add TX</button>
+    </form>
+</template>
+.......................................
+
+App.vue
+.......................................
+<script setup>
+    ...
+    
+    import { uid } from 'uid'; // Needs installing: $ npm i --save-dev uid
+    import { useToast } from 'vue-toastification';
+    
+    const toast = useToast();
+    
+    ...
+    
+    // handleTxSubmitted function
+    const handleTxSubmitted = (txData) => {
+        txs.value.push({
+            id: uid(), // Requires import
+            text: txData.text,
+            amount: txData.amount,
+        });
+
+        toast.success('Transaction added');
+    }
+</script>
+
+<template>
+    ...
+        <AddTransaction @txSubmitted="handleTxSubmitted" /> <!-- Listen for emit event -->
+    ...
+</template>
+.......................................
+
+main.js
+.......................................
+import { createApp } from 'vue'
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+
+import './assets/style.css'
+import App from './App.vue'
+
+const app = createApp(App)
+
+const conf = {
+    timeout: 2400,
+    hideProgressBar: true,
+    // closeButton: false
+    showCloseButtonOnHover: true
+};
+
+/*
+// import Toast, { TYPE } from 'vue-toastification';
+const conf = {
+    toastDefaults: {
+        // ToastOptions object for each type of toast
+        [TYPE.ERROR]: {
+            timeout: 10000,
+            closeButton: false,
+        },
+        [TYPE.SUCCESS]: {
+            timeout: 3000,
+            hideProgressBar: true,
+        }    
+    }
+};
+*/
+
+app.use(Toast, conf);
+app.mount('#app');
+.......................................
+
+
+
+
+# #############################################
+# Install vue-toastification (form validation)
+# ############################################# 
+
+# Install:
+$ npm i vue-toastification@next
+
+# Will be added to 'package.json' file:
+.......................................
+"dependencies": {
+  "vue": "^3.4.21",
+  "vue-toastification": "^2.0.0-rc.5"
+},
+.......................................
+
+src/main.js
+.......................................
+import { createApp } from 'vue'
+import Toast from 'vue-toastification'
+import 'vue-toastification/dist/index.css'
+
+import './assets/style.css'
+import App from './App.vue'
+
+const app = createApp(App)
+app.use(Toast);
+app.mount('#app');
+.......................................
