@@ -326,6 +326,25 @@ IncomeExpenses.vue
 # Add Transaction
 # ############################################# 
 
+
+# Install vue-toastification (form validation)
+# +++++++++++++++++++++++++++++++++++++++++++++
+
+# Install:
+$ npm i vue-toastification@next
+
+# Will be added to 'package.json' file:
+.......................................
+"dependencies": {
+  "vue": "^3.4.21",
+  "vue-toastification": "^2.0.0-rc.5"
+},
+.......................................
+
+https://github.com/Maronato/vue-toastification?tab=readme-ov-file
+
+
+
 AddTransaction.vue
 .......................................
 <script setup>
@@ -449,22 +468,10 @@ app.use(Toast, conf);
 app.mount('#app');
 .......................................
 
-
-
-
 # #############################################
-# Install vue-toastification (form validation)
+# Setup Local Storage
 # ############################################# 
 
-# Install:
-$ npm i vue-toastification@next
+To view saved localStorage (Firefox) Storage|Local Storage|http://localhost:5173
 
-# Will be added to 'package.json' file:
-.......................................
-"dependencies": {
-  "vue": "^3.4.21",
-  "vue-toastification": "^2.0.0-rc.5"
-},
-.......................................
 
-https://github.com/Maronato/vue-toastification?tab=readme-ov-file

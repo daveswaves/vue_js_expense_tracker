@@ -6,18 +6,22 @@
     import AddTransaction from './components/AddTransaction.vue';
 
     // Required to be reactive - updates display when array data updates
-    import { ref, computed } from 'vue';
+    import { ref, computed, onMounted } from 'vue';
     import { uid } from 'uid'; // Needs installing: $ npm i --save-dev uid
     import { useToast } from 'vue-toastification';
 
     const toast = useToast();
 
     // Exists here to make available to all components that require data
-    const txs = ref([
-        { id: 'e45c30681f2', text: 'Flower', amount: -19.99 },
-        { id: '26fff0dca14', text: 'Payment', amount: 299.97 },
-        { id: '6fff0dca145', text: 'Book', amount: -10.95 },
-    ]);
+    const txs = ref([]);
+
+    onMounted(() => {
+        const savedTxs = JSON.parse(localStorage.getItem('txs'));
+
+        if (savedTxs) {
+            txs.value = savedTxs;
+        }
+    });
 
     // Add all amounts and return total
     const total = computed(() => {
@@ -53,6 +57,8 @@
             amount: txData.amount,
         });
 
+        saveTxsToLocalStorage();
+
         toast.success('Transaction added');
     }
 
@@ -61,10 +67,15 @@
         // console.log(id);
         txs.value = txs.value.filter((tx) => tx.id !== id);
 
+        saveTxsToLocalStorage();
+
         toast.success('TX deleted');
     }
 
-    // https://youtu.be/hNPwdOZ3qFU?t=3466
+    // Save to localstorage
+    const saveTxsToLocalStorage = () => {
+        localStorage.setItem('txs', JSON.stringify(txs.value));
+    }
 </script>
 
 <template>
