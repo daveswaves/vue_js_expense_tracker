@@ -1,4 +1,6 @@
 <script setup>
+    const emit = defineEmits(['txDeleted']);
+    
     // Required to use 'const txs' in 'src/App.vue'
     const props = defineProps({
         txs: {
@@ -6,6 +8,10 @@
             required: true
         }
     });
+
+    const deleteTx = (id) => {
+        emit('txDeleted', id);
+    };
 </script>
 
 <template>
@@ -16,7 +22,7 @@
             :key="tx.id"
             :class="tx.amount < 0 ? 'minus' : 'plus'"
         >
-            {{tx.text}} <span>{{tx.amount}}</span><button class="delete-btn">x</button>
+            {{tx.text}} <span>{{tx.amount}}</span><button @click="deleteTx(tx.id)" class="delete-btn">x</button>
         </li>
     </ul>
 

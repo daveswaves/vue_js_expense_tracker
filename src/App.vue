@@ -14,9 +14,9 @@
 
     // Exists here to make available to all components that require data
     const txs = ref([
-        { id: 1, text: 'Flower', amount: -19.99 },
-        { id: 2, text: 'Payment', amount: 299.97 },
-        { id: 3, text: 'Book', amount: -10.95 },
+        { id: 'e45c30681f2', text: 'Flower', amount: -19.99 },
+        { id: '26fff0dca14', text: 'Payment', amount: 299.97 },
+        { id: '6fff0dca145', text: 'Book', amount: -10.95 },
     ]);
 
     // Add all amounts and return total
@@ -56,6 +56,14 @@
         toast.success('Transaction added');
     }
 
+    // Delete Transaction
+    const handleTxDeleted = (id) => {
+        // console.log(id);
+        txs.value = txs.value.filter((tx) => tx.id !== id);
+
+        toast.success('TX deleted');
+    }
+
     // https://youtu.be/hNPwdOZ3qFU?t=3466
 </script>
 
@@ -64,7 +72,7 @@
     <div class="container">
         <Balance :total="+total" />
         <IncomeExpenses :totalIncome="+totalIncome" :totalExpenses="+totalExpenses" />
-        <History :txs="txs" /> <!-- Pass in props -->
+        <History :txs="txs" @txDeleted="handleTxDeleted" /> <!-- Pass in props -->
         <AddTransaction @txSubmitted="handleTxSubmitted" /> <!-- Listen for emit event -->
     </div>
 </template>
